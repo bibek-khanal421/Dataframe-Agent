@@ -4,35 +4,56 @@ from typing import List
 from langchain_openai import ChatOpenAI
 from decouple import config 
 from config.configtracker import ConfigTracker
+from llm.openai import OpenAI
+from llm.base import LLM
+from typing import List
+import io
 
 class GenerateCode(BaseLogicUnit):
 
-    def __init__(self, configtracker: ConfigTracker = None, dfs: DataFrame = None, query: str = None):
+    def __init__(self, configtracker: ConfigTracker = None, dfs: List = None, query: str = None):
         super(GenerateCode, self).__init__(config=configtracker)
         self.dfs = dfs
         self.query = query
-        self.llm = ChatOpenAI(temperature=0.3, openai_api_key=config("OPENAI_API_KEY"), model="gpt-4")
+        self.llm = LLM(OpenAI(temperature=0.3))
 
-    def completion(self, prompt: str):
-        result = self.llm.invoke(prompt)
-        return result.content
+    def _get_dataframe_info(self, df:DataFrame):
+        buf = io.StringIO()
+        df.info(buf=buf, verbose=False)
+        info = buf.getvalue()
+        return str(info)
         
     def execute(self):
         prompt = f"""
-        Dataframe Information: {str(self.dfs)}
+        Dataframe Information: 
+        {[ f"dfs[{i}]:/n/n" + self._get_dataframe_info(df) + "/n/n" for i, df in enumerate(self.dfs)]}
         Generate me a executable python code for pandas using the above dataframe description and user question
         The code should generate a result to satisfy the user question.
 
-        NOTE: the input to the code is a `pd.DataFrame` object named `dfs`
+        NOTE: the input to the code is a  `List(pd.DataFrame)` object named `dfs` which is already supplied to the code
 
         Q: {self.query}
 
-        return the result in a variable named `result`
+        if the user asks for any type of plot then only generate the dataframe required for the plot and not the plot itself
+
+        generate the result as a dictionary containing two variables type and table 
+        the type specifies the type of plot eg: line, scatter, bar, pie, table etc.
+        the table contains the dataframe required for the plot
+        
+        save the result in a variable named `result`
+        """ + """
+        example: ```result = {"type": "table", "table": dataframe}``` or ```result = {"type": "line", "table": dataframe}``` or ```result = {"type": "scatter", "table": dataframe}```
+        
+        Write code without any ``` formatting
+
         code:
         """
         self.config.set("pandas_code_generation_prompt", prompt)
-        response = self.completion(prompt)
+        response = self.llm.completion(prompt)
         self.config.set("pandas_code_generation_response", response)
-        return {"result": self.completion(prompt), 
-                "config": self.config }
+        return {
+            "config": self.config, 
+            "dfs": self.dfs,
+            "query": self.query
+        }
 
