@@ -28,3 +28,6 @@ result = agent.act("which country has the highest gdp?")
 ```
 
 Sample for using agent can be found in demo.py python file
+
+## References
+- https://github.com/Sinaptik-AI/pandas-ai
