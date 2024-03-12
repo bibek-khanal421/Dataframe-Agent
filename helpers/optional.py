@@ -22,6 +22,7 @@ VERSIONS = {
 
 INSTALL_MAPPING = {}
 
+
 def get_version(module: types.ModuleType) -> str:
     """Get the version of a module."""
     version = getattr(module, "__version__", None)
@@ -30,6 +31,7 @@ def get_version(module: types.ModuleType) -> str:
         raise ImportError(f"Can't determine version for {module.__name__}")
 
     return version
+
 
 def import_dependency(
     name: str,

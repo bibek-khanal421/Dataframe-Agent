@@ -1,4 +1,5 @@
-"""
+(
+    """
 Dataframe Information: 
 {dataframe_info_list}
 Generate me a executable python code for pandas using the above dataframe description and user question
@@ -15,19 +16,21 @@ the type specifies the type of plot eg: line, scatter, bar, pie, table etc.
 the table contains the dataframe required for the plot
 
 save the result in a variable named `result`
-""" + """
+"""
+    + """
 example: ```result = {"type": "table", "table": dataframe}``` or ```result = {"type": "line", "table": dataframe}``` or ```result = {"type": "scatter", "table": dataframe}```
 
 Write code without any ``` formatting
 
 code:
 """
+)
 
 
 from .base import BasePrompt
 
-class CodeGenerationPrompt(BasePrompt):
 
+class CodeGenerationPrompt(BasePrompt):
     _prompt_url = "prompt/assets/code_generation_prompt.tmpl"
 
     def __init__(self, vars):
@@ -41,4 +44,3 @@ class CodeGenerationPrompt(BasePrompt):
             return prompt
         except Exception as e:
             raise RuntimeError(f"Error getting prompt: {e}")
-        

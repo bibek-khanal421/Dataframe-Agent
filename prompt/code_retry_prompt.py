@@ -4,8 +4,8 @@
 
 from .base import BasePrompt
 
-class CodeRetryPrompt(BasePrompt):
 
+class CodeRetryPrompt(BasePrompt):
     _prompt_url = "prompt/assets/code_retry_prompt.tmpl"
 
     def __init__(self, vars):
@@ -19,5 +19,3 @@ class CodeRetryPrompt(BasePrompt):
             return prompt
         except Exception as e:
             raise RuntimeError(f"Error getting prompt: {e}")
-        
-    

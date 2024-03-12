@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 
-class BaseLLM(ABC):
 
+class BaseLLM(ABC):
     @abstractmethod
     def get_llm(self):
         NotImplementedError
@@ -14,7 +14,7 @@ class BaseLLM(ABC):
 class LLM:
     def __init__(self, llm):
         self.llm = llm
-    
+
     def completion(self, prompt: str):
         result = self.llm.completion(prompt)
         return result

@@ -1,19 +1,22 @@
-from DFagent import Agent
 import pandas as pd
 
+from DFagent import Agent
 
-df0 = pd.DataFrame({
-    "country": ["United States", "United Kingdom", "France", "Germany", "Italy", "Spain", "Canada", "Australia", "Japan", "China"],
-    "gdp": [19294482071552, 2891615567872, 2411255037952, 3435817336832, 1745433788416, 1181205135360, 1607402389504, 1490967855104, 4380756541440, 14631844184064],
-    "happiness_index": [6.94, 7.16, 6.66, 7.07, 6.38, 6.4, 7.23, 7.22, 5.87, 5.12]
-})
+data = {
+    "Name": ["Alice", "Bob", "Charlie", "David", "Emily"],
+    "Age": [25, 30, 35, 40, 45],
+    "City": ["New York", "Los Angeles", "Chicago", "Houston", "Phoenix"],
+    "Salary": [50000, 60000, 70000, 80000, 90000],
+}
 
-
-dfs = [df0]
+# Creating a DataFrame from the dictionary
+df = pd.DataFrame(data)
+dfs = [df]
 
 agent = Agent(dfs)
 
-
-result = agent.act("what is the average gdp of the countries with a happiness index greater than 7?")
+result = agent.act(
+    "what is the average gdp of the countries with a happiness index greater than 7?"
+)
 
 print("Result: ", result)

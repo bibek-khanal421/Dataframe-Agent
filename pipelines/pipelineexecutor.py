@@ -1,23 +1,24 @@
-from .generatecode import GenerateCode
-from .executecode import ExecuteCode
-from .validateresult import ValidateResult
 from typing import Dict, List
+
 from config.configtracker import ConfigTracker
 
+from .executecode import ExecuteCode
+from .generatecode import GenerateCode
+from .validateresult import ValidateResult
+
+
 class PipelineGenerator:
-    def __init__(self, config: ConfigTracker=None, dfs: List = None, query: str = None):
-        self.config = config 
-        self.dfs = dfs 
+    def __init__(
+        self, config: ConfigTracker = None, dfs: List = None, query: str = None
+    ):
+        self.config = config
+        self.dfs = dfs
         self.query = query
 
     def _generate_pipeline(self):
-        pipeline = [
-            GenerateCode,
-            ExecuteCode,
-            ValidateResult
-        ]
-        return pipeline 
-    
+        pipeline = [GenerateCode, ExecuteCode, ValidateResult]
+        return pipeline
+
     def run(self):
         pipeline = self._generate_pipeline()
         for module in pipeline:
@@ -26,5 +27,4 @@ class PipelineGenerator:
             self.dfs = data.get("dfs")
             self.query = data.get("query")
         result = self.config.get("validated_result")
-        return result 
-    
+        return result
