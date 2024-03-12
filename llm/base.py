@@ -17,4 +17,4 @@ class LLM:
     
     def completion(self, prompt: str):
         result = self.llm.completion(prompt)
-        return result.content
+        return result

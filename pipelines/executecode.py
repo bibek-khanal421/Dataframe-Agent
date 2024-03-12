@@ -9,6 +9,9 @@ from constants import WHITELISTED_BUILTINS, WHITELISTED_LIBRARIES
 import pandas as pd
 import ast
 import astor
+from secret_manager.secret import SecretManager
+
+MAX_RETRIES = int(SecretManager().get_from_env(key = "MAX_RETRIES"))
 
 class ExecuteCode(BaseLogicUnit):
 
@@ -183,22 +186,41 @@ class ExecuteCode(BaseLogicUnit):
 
         new_tree = ast.Module(body=new_body)
         return astor.to_source(new_tree, pretty_source=lambda x: "".join(x)).strip()
+    
+    def _execute_with_retry(self, code: str, environment: dict) -> Any:
+        """
+        Execute the code with retry if an exception is raised.
+
+        Args:
+            code (str): The code to execute.
+            environment (dict): The environment for the code to be executed.
+
+        Returns (Any): The result of the code execution.
+
+        """
+
+        retries = 0
+        while retries < MAX_RETRIES:
+            try:
+                exec(code, environment)
+                return environment.get("result", None)
+            except Exception as e:
+                retries += 1
+                self.config.get("retry_code_generation_function")()
+                print(f"retrying... {retries}|{MAX_RETRIES}")
+                if retries == MAX_RETRIES:
+                    return None
 
     
     def execute(self):
         code_to_run = self.config.get("pandas_code_generation_response") 
         code_to_run = self._clean_code(code_to_run)
-        print(code_to_run)
         dfs = self._required_dfs(code_to_run) 
-        print("===============================================")
-        print(dfs)
         environment: dict = self._get_environment()
         environment["dfs"] = dfs
-        exec(code_to_run, environment)
-        if "result" not in environment:
-            self.config.set("code_execution_result", None)
-        else:
-            self.config.set("code_execution_result", environment.get('result', None))
+        environment["result"] = None
+        result = self._execute_with_retry(code_to_run, environment)
+        self.config.set("code_execution_result", result)
         return {
             "config": self.config, 
             "dfs": self.dfs,
