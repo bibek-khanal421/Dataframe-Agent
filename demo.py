@@ -16,7 +16,7 @@ dfs = [df]
 agent = Agent(dfs)
 
 result = agent.act(
-    "what is the average gdp of the countries with a happiness index greater than 7?"
+    "what are the names with salary greater than 50k?"
 )
 
 print("Result: ", result)
